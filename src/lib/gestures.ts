@@ -4,6 +4,7 @@ import {
     calculateDelata,
     distance,
     get360angleVector2D,
+    normalize,
     twoFingerDirection,
     twoFingerDotProduct
 } from './vectorMath'
@@ -23,6 +24,13 @@ export interface IGestures {
     onTripleDragGesture?: (direction: Vector, pointers: IPointer[]) => void,
 }
 
+interface ITap {
+    distance: number,
+    timer: NodeJS.Timeout | null,
+    timerTime: number,
+    fingerId: number
+}
+
 export const useGestures = (
     gestureComponentRef: any,
     gestures: IGestures
@@ -31,6 +39,12 @@ export const useGestures = (
 
     const dragDistance = useRef(0) // save drag distance for calculating if tap is possible
     const onGoingTouches = useRef<IPointer[]>([])
+    const tap = useRef<ITap>({
+        distance: 10,
+        timer: null,
+        timerTime: 0,
+        fingerId: -1
+    })
 
     const copyTouch = (event: PointerEvent): IPointer => {
         let delta = new Vector([0, 0])
@@ -47,6 +61,9 @@ export const useGestures = (
     }
 
     const handleCancel = (event: PointerEvent) => {
+        tap.current.fingerId = -1;
+        if (tap.current.timer)
+            clearInterval(tap.current.timer)
         const index = onGoingTouchIndexById(event.pointerId)
         onGoingTouches.current.splice(index, 1)
     }
@@ -67,6 +84,11 @@ export const useGestures = (
         onGoingTouches.current.push(copyTouch(event))
         const index = onGoingTouchIndexById(event.pointerId)
         dragDistance.current = 0
+        tap.current.timer = setInterval(()=>{
+                if (tap.current.timerTime)
+                    tap.current.timerTime += 1
+            }, 50)
+            
         handleGestures(index)
     }
 
@@ -78,7 +100,6 @@ export const useGestures = (
             dragDistance.current >= 0 &&
             index !== -1
         ) {
-            // useTapMessage(onGoingTouches.current[index].vector)
             if (onTapGesture){
                 onTapGesture(onGoingTouches.current[index])
             }
@@ -117,7 +138,7 @@ export const useGestures = (
     const dragGesture = (touchIndex: number) => {
         const curTouch = onGoingTouches.current[touchIndex]
         dragDistance.current += curTouch.delta.length()
-        // useDragMessage(onGoingTouches.current.length, curTouch.delta)
+        
         if (onDragGesture){
             onDragGesture(curTouch)
         }
@@ -132,17 +153,12 @@ export const useGestures = (
         const delta0 = onGoingTouches.current[0].delta
         const delta1 = onGoingTouches.current[1].delta
 
-        const vector0delta0 = new Vector(
-            onGoingTouches.current[0].position.values
-        ).substract(delta0)
+        const vector0delta0 = onGoingTouches.current[0].position.substract(delta0)
 
-        const vector1delta1 = new Vector(
-            onGoingTouches.current[1].position.values
-        ).substract(delta1)
+        const vector1delta1 = onGoingTouches.current[1].position.substract(delta1)
 
         const pinch = curDistance - distance(vector0delta0, vector1delta1)
 
-        // usePinchMessage(pinch)
         if (onPinchGesture)
             onPinchGesture(pinch)
     }
@@ -152,16 +168,12 @@ export const useGestures = (
 
         const delta0 = onGoingTouches.current[0].delta
         const delta1 = onGoingTouches.current[1].delta
-        const vector0delta0 = new Vector(
-            onGoingTouches.current[0].position.values
-        ).substract(delta0)
+        const vector0delta0 = onGoingTouches.current[0].position.substract(delta0)
 
-        const vector1delta1 = new Vector(
-            onGoingTouches.current[1].position.values
-        ).substract(delta1)
+        const vector1delta1 = onGoingTouches.current[1].position.substract(delta1)
 
-        const curDelta = new Vector(curTouches[0].position.values).substract(
-            new Vector(curTouches[1].position.values)
+        const curDelta =curTouches[0].position.substract(
+            curTouches[1].position
         )
 
         const prevDelta = vector0delta0.substract(vector1delta1)
@@ -189,7 +201,7 @@ export const useGestures = (
 
     const tripleDragGesture = () => {
         const curTouches = onGoingTouches.current
-        if (onTripleDragGesture === undefined || curTouches[2].delta.equals(new Vector([0,0])))
+        if (onTripleDragGesture === undefined)
             return
 
         //twoFingerDotProduct
@@ -197,14 +209,10 @@ export const useGestures = (
         //twoFingerDirection
         const _twoFingerDirection = twoFingerDirection(onGoingTouches.current)
         //dotProduct
-        const vec2Normalized = new Vector(
-            curTouches[2].delta.values
-        ).normalize()
-        const twoFingerDirectionMultiplied = new Vector(
-            _twoFingerDirection.values
-        )
-            .multiply(new Vector([_twoFingerDotProduct, _twoFingerDotProduct]))
-            .normalize() //(twoFingerDirection * twoFingerDotProduct).normalized)
+        const vec2Normalized = normalize(curTouches[2].delta)
+        const twoFingerDirectionMultiplied =normalize(_twoFingerDirection
+            .multiply(new Vector([_twoFingerDotProduct, _twoFingerDotProduct])))
+
         const dotProduct = vec2Normalized.dot(twoFingerDirectionMultiplied)
         const maxDotProduct = Math.max(0, dotProduct)
         //direction
@@ -213,14 +221,7 @@ export const useGestures = (
         const tripleDrag = direction.multiply(
             new Vector([maxDotProduct, maxDotProduct])
         )
-
-        //unfortunately ts-matrix returns NaN on some operations like normalize or dot when it should be returning [0,0]
-        if (isNaN(tripleDrag.at(0)) || isNaN(tripleDrag.at(1))){
-            return
-        }
             
-
-        
         // useTripleDragMessage(onGoingTouches.current.length, tripleDrag)
         onTripleDragGesture(tripleDrag, curTouches)
         
@@ -232,11 +233,11 @@ export const useGestures = (
             handleStart,
             false
         )
-        // gestureComponent.current.addEventListener(
-        //     'pointerup',
-        //     handleCancel,
-        //     false
-        // )
+        gestureComponentRef.current.addEventListener(
+            'pointercancel',
+            handleCancel,
+            false
+        )
         gestureComponentRef.current.addEventListener('pointerup', handleEnd, false)
         gestureComponentRef.current.addEventListener(
             'pointermove',
@@ -254,10 +255,10 @@ export const useGestures = (
                 'pointerdown',
                 handleStart
             )
-            // gestureComponent.current.removeEventListener(
-            //     'pointerup',
-            //     handleCancel
-            // )
+            gestureComponentRef.current.removeEventListener(
+                'pointercancel',
+                handleCancel
+            )
             gestureComponentRef.current.removeEventListener('pointerup', handleEnd)
             gestureComponentRef.current.removeEventListener(
                 'pointermove',

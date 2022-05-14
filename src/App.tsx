@@ -1,11 +1,7 @@
 import React, { useRef } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { Canvas } from 'react-three-fiber';
 import Mesh from './Mesh';
-import { OrbitControls } from 'drei/OrbitControls';
-import { useGestures } from './lib/gestures';
-import { Vector } from 'ts-matrix';
 
 function App() {
   const componentRef = useRef(null);

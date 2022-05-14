@@ -21,11 +21,11 @@ export const normalize = (v: Vector): Vector => {
         return new Vector([0, 0])
     }
 
-    return new Vector(v.values).normalize()
+    return v.normalize()
 }
 
 export const direction = (p1: Vector, p2: Vector): Vector => {
-    return new Vector(p2.substract(p1).values)
+    return p2.substract(p1)
 }
 
 export const get360angleVector2D = (v1: Vector, v2: Vector): number => {
@@ -35,14 +35,14 @@ export const get360angleVector2D = (v1: Vector, v2: Vector): number => {
 }
 
 export const twoFingerDirection = (curTouches: IPointer[]) => {
-    return new Vector(curTouches[0].delta.values).add(curTouches[1].delta)
+    return curTouches[0].delta.add(curTouches[1].delta)
 }
 
 export const twoFingerDotProduct = (curTouches: IPointer[]) => {
-    const vec0Normalized = normalize(new Vector(curTouches[0].delta.values))
-    const vec1Normalized = normalize(new Vector(curTouches[1].delta.values))
+    const vec0Normalized = normalize(curTouches[0].delta)
+    const vec1Normalized = normalize(curTouches[1].delta)
 
-    const dotProduct = new Vector(vec0Normalized.values).dot(vec1Normalized)
+    const dotProduct = vec0Normalized.dot(vec1Normalized)
 
     return Math.max(0, dotProduct)
 }

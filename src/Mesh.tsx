@@ -51,10 +51,8 @@ const Mesh = (props: Props) => {
         if (!myMeshRef.current) {
             return;
         }
-        // if (direction.at(0) === NaN || )
-        //     direction. = 0
-        console.log(`${direction.at(0)}, ${direction.at(0)}`)
-        myMeshRef.current.position.y += (direction.at(1) * 0.05)
+
+        myMeshRef.current.position.y -= (direction.at(1) * 0.05)
     }
 
     useGestures(props.componentRef, {
@@ -66,7 +64,6 @@ const Mesh = (props: Props) => {
         onTripleDragGesture: onTripleDrag
     }
     )
-
 
     return (
         <mesh rotation={[0, 0, 0]} ref={myMeshRef}>
