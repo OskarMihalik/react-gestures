@@ -57,13 +57,14 @@ const Mesh = (props: Props) => {
         myMeshRef.current.position.y += (direction.at(1) * 0.05)
     }
 
-    useGestures(props.componentRef,
-        onTap,
-        onDrag,
-        onRotate,
-        onPinch,
-        onDoubleDrag,
-        onTripleDrag
+    useGestures(props.componentRef, {
+        onTapGesture: onTap,
+        onDragGesture: onDrag,
+        onPinchGesture: onPinch,
+        onRotateGesture: onRotate,
+        onDoubleDragGesture: onDoubleDrag,
+        onTripleDragGesture: onTripleDrag
+    }
     )
 
 

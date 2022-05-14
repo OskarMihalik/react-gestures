@@ -14,15 +14,21 @@ export interface IPointer {
     delta: Vector
 }
 
-export const useGestures = (
-    gestureComponentRef: any,
+export interface IGestures {
     onTapGesture?: (pointer: IPointer) => void,
     onDragGesture?: (pointer: IPointer) => void,
     onRotateGesture?: (rotate: number) => void,
     onPinchGesture?: (scale: number) => void,
     onDoubleDragGesture?: (direction: Vector, pointers: IPointer[]) => void,
     onTripleDragGesture?: (direction: Vector, pointers: IPointer[]) => void,
+}
+
+export const useGestures = (
+    gestureComponentRef: any,
+    gestures: IGestures
 ) => {
+    const {onTapGesture, onDragGesture, onRotateGesture, onPinchGesture, onDoubleDragGesture, onTripleDragGesture} = gestures
+
     const dragDistance = useRef(0) // save drag distance for calculating if tap is possible
     const onGoingTouches = useRef<IPointer[]>([])
 
@@ -207,8 +213,9 @@ export const useGestures = (
         const tripleDrag = direction.multiply(
             new Vector([maxDotProduct, maxDotProduct])
         )
+
+        //unfortunately ts-matrix returns NaN on some operations like normalize or dot when it should be returning [0,0]
         if (isNaN(tripleDrag.at(0)) || isNaN(tripleDrag.at(1))){
-            // debugger
             return
         }
             
