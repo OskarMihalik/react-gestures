@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { Vector } from 'ts-matrix'
+import useTap from './useTap'
 import {
     calculateDelata,
     distance,
@@ -17,6 +18,7 @@ export interface IPointer {
 
 export interface IGestures {
     onTapGesture?: (pointer: IPointer) => void,
+    onHoldGesture?: (pointer: IPointer) => void,
     onDragGesture?: (pointer: IPointer) => void,
     onRotateGesture?: (rotate: number) => void,
     onPinchGesture?: (scale: number) => void,
@@ -35,16 +37,11 @@ export const useGestures = (
     gestureComponentRef: any,
     gestures: IGestures
 ) => {
-    const {onTapGesture, onDragGesture, onRotateGesture, onPinchGesture, onDoubleDragGesture, onTripleDragGesture} = gestures
+    const {onTapGesture, onDragGesture, onRotateGesture, onPinchGesture, onDoubleDragGesture, onTripleDragGesture, onHoldGesture} = gestures
 
     const dragDistance = useRef(0) // save drag distance for calculating if tap is possible
     const onGoingTouches = useRef<IPointer[]>([])
-    const tap = useRef<ITap>({
-        distance: 10,
-        timer: null,
-        timerTime: 0,
-        fingerId: -1
-    })
+    const tap = useTap()
 
     const copyTouch = (event: PointerEvent): IPointer => {
         let delta = new Vector([0, 0])
@@ -61,10 +58,11 @@ export const useGestures = (
     }
 
     const handleCancel = (event: PointerEvent) => {
-        tap.current.fingerId = -1;
-        if (tap.current.timer)
-            clearInterval(tap.current.timer)
+        tap.reset()
         const index = onGoingTouchIndexById(event.pointerId)
+        if (index === -1 ){
+            return
+        }
         onGoingTouches.current.splice(index, 1)
     }
 
@@ -83,27 +81,34 @@ export const useGestures = (
         event.preventDefault()
         onGoingTouches.current.push(copyTouch(event))
         const index = onGoingTouchIndexById(event.pointerId)
-        dragDistance.current = 0
-        tap.current.timer = setInterval(()=>{
-                if (tap.current.timerTime)
-                    tap.current.timerTime += 1
-            }, 50)
-            
+
+        tap.startTimer()
+
         handleGestures(index)
     }
 
     const handleEnd = (event: PointerEvent) => {
         const index = onGoingTouchIndexById(event.pointerId)
-        if (
-            onGoingTouches.current.length === 1 &&
-            dragDistance.current < 10 &&
-            dragDistance.current >= 0 &&
-            index !== -1
-        ) {
-            if (onTapGesture){
-                onTapGesture(onGoingTouches.current[index])
-            }
+        // if (
+        //     onGoingTouches.current.length === 1 &&
+        //     dragDistance.current < 10 &&
+        //     dragDistance.current >= 0 &&
+        //     index !== -1
+        // ) {
+        //     if (onTapGesture){
+        //         onTapGesture(onGoingTouches.current[index])
+        //     }
+        // }
+        if (index === -1){
+            return
         }
+        tap.differentiatetapHold(
+            ()=> {if (onTapGesture) onTapGesture(onGoingTouches.current[index])}, 
+            ()=> {if (onHoldGesture) onHoldGesture(onGoingTouches.current[index])}
+            )
+
+        tap.reset()
+
         dragDistance.current = -0.1
         onGoingTouches.current.splice(index, 1)
     }
@@ -124,20 +129,25 @@ export const useGestures = (
     const handleGestures = (currentTouchIndex: number) => {
         if (onGoingTouches.current.length === 1) {
             dragGesture(currentTouchIndex)
+
         } else if (onGoingTouches.current.length === 2) {
             pinchGesture()
             rotateGesture()
             doubleDragGesture()
             dragDistance.current = -0.1
+            tap.reset()
+
         } else if (onGoingTouches.current.length === 3) {
             tripleDragGesture()
             dragDistance.current = -0.1
+            tap.reset()
         }
     }
 
     const dragGesture = (touchIndex: number) => {
         const curTouch = onGoingTouches.current[touchIndex]
         dragDistance.current += curTouch.delta.length()
+        tap.updateDistance(curTouch.delta.length())
         
         if (onDragGesture){
             onDragGesture(curTouch)
@@ -222,7 +232,6 @@ export const useGestures = (
             new Vector([maxDotProduct, maxDotProduct])
         )
             
-        // useTripleDragMessage(onGoingTouches.current.length, tripleDrag)
         onTripleDragGesture(tripleDrag, curTouches)
         
     }
