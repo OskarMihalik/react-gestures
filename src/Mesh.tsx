@@ -8,24 +8,62 @@ type Props = {
 }
 
 const Mesh = (props: Props) => {
-    const myMeshRef = useRef<any>()
+    const myMeshRef = useRef<MeshProps>()
 
     const onTap = (pointer: IPointer) => {
         console.log("tap:", pointer.position)
     }
 
     const onDrag = (pointer: IPointer) => {
+        if (!myMeshRef.current) {
+            return;
+        }
         myMeshRef.current.position.x = myMeshRef.current.position.x + (pointer.delta.at(0) * 0.05)
         myMeshRef.current.position.y = myMeshRef.current.position.y - pointer.delta.at(1) * 0.05
     }
 
-    // const onRotate = (rotation: number) => {
-    //     myMeshRef.current.rotation.x = myMeshRef.current.position.x + (pointer.delta.at(0) * 0.05)
-    // }
+    const onRotate = (rotation: number) => {
+        if (!myMeshRef.current) {
+            return;
+        }
+        myMeshRef.current.rotation.y += rotation * 0.1
+    }
+
+    const onPinch = (scale: number) => {
+        if (!myMeshRef.current) {
+            return;
+        }
+        const pinch = scale * 0.005
+        myMeshRef.current.scale.x += pinch
+        myMeshRef.current.scale.y += pinch
+        myMeshRef.current.scale.z += pinch
+    }
+
+    const onDoubleDrag = (direction: Vector, pointers: IPointer[]) => {
+        if (!myMeshRef.current) {
+            return;
+        }
+        myMeshRef.current.position.x += (direction.at(0) * 0.05)
+        myMeshRef.current.position.z += (direction.at(1) * 0.05)
+    }
+
+    const onTripleDrag = (direction: Vector, pointers: IPointer[]) => {
+        if (!myMeshRef.current) {
+            return;
+        }
+        // if (direction.at(0) === NaN || )
+        //     direction. = 0
+        console.log(`${direction.at(0)}, ${direction.at(0)}`)
+        myMeshRef.current.position.y += (direction.at(1) * 0.05)
+    }
 
     useGestures(props.componentRef,
         onTap,
-        onDrag
+        onDrag,
+        onRotate,
+        onPinch,
+        onDoubleDrag,
+        onTripleDrag
     )
 
 

@@ -20,8 +20,8 @@ export const useGestures = (
     onDragGesture?: (pointer: IPointer) => void,
     onRotateGesture?: (rotate: number) => void,
     onPinchGesture?: (scale: number) => void,
-    onDoubleDragGesture?: (direction: IPointer, pointers: IPointer[]) => void,
-    onTripleDragGesture?: (direction: IPointer, pointers: IPointer[]) => void,
+    onDoubleDragGesture?: (direction: Vector, pointers: IPointer[]) => void,
+    onTripleDragGesture?: (direction: Vector, pointers: IPointer[]) => void,
 ) => {
     const dragDistance = useRef(0) // save drag distance for calculating if tap is possible
     const onGoingTouches = useRef<IPointer[]>([])
@@ -137,6 +137,8 @@ export const useGestures = (
         const pinch = curDistance - distance(vector0delta0, vector1delta1)
 
         // usePinchMessage(pinch)
+        if (onPinchGesture)
+            onPinchGesture(pinch)
     }
 
     const rotateGesture = () => {
@@ -175,10 +177,15 @@ export const useGestures = (
         )
 
         // useDoubleDragMessage(onGoingTouches.current.length, doubleDragFinal)
+        if (onDoubleDragGesture)
+            onDoubleDragGesture(doubleDragFinal, onGoingTouches.current)
     }
 
     const tripleDragGesture = () => {
         const curTouches = onGoingTouches.current
+        if (onTripleDragGesture === undefined || curTouches[2].delta.equals(new Vector([0,0])))
+            return
+
         //twoFingerDotProduct
         const _twoFingerDotProduct = twoFingerDotProduct(onGoingTouches.current)
         //twoFingerDirection
@@ -200,8 +207,16 @@ export const useGestures = (
         const tripleDrag = direction.multiply(
             new Vector([maxDotProduct, maxDotProduct])
         )
+        if (isNaN(tripleDrag.at(0)) || isNaN(tripleDrag.at(1))){
+            // debugger
+            return
+        }
+            
 
+        
         // useTripleDragMessage(onGoingTouches.current.length, tripleDrag)
+        onTripleDragGesture(tripleDrag, curTouches)
+        
     }
 
     useEffect(() => {
