@@ -67,7 +67,9 @@ const Mesh = (props: Props) => {
         onDoubleDragGesture: onDoubleDrag,
         onTripleDragGesture: onTripleDrag,
         onHoldGesture: onHold
-    }
+    },
+        // 8,
+        // 100
     )
 
     return (

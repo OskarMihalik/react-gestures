@@ -28,12 +28,14 @@ export interface IGestures {
 
 export const useGestures = (
     gestureComponentRef: any,
-    gestures: IGestures
+    gestures: IGestures,
+    distanceTreshold: number = 8,
+    holdTime: number = 100
 ) => {
     const {onTapGesture, onDragGesture, onRotateGesture, onPinchGesture, onDoubleDragGesture, onTripleDragGesture, onHoldGesture} = gestures
 
     const onGoingTouches = useRef<IPointer[]>([])
-    const tap = useTap()
+    const tap = useTap(distanceTreshold, holdTime)
 
     const copyTouch = (event: PointerEvent): IPointer => {
         let delta = new Vector([0, 0])
@@ -119,7 +121,9 @@ export const useGestures = (
 
     const handleGestures = (currentTouchIndex: number) => {
         if (onGoingTouches.current.length === 1) {
-            dragGesture(currentTouchIndex)
+            tap.updateDistance(onGoingTouches.current[currentTouchIndex].delta.length())
+            if (tap.canDrag())
+                dragGesture(currentTouchIndex)
 
         } else if (onGoingTouches.current.length === 2) {
             pinchGesture()
@@ -135,7 +139,6 @@ export const useGestures = (
 
     const dragGesture = (touchIndex: number) => {
         const curTouch = onGoingTouches.current[touchIndex]
-        tap.updateDistance(curTouch.delta.length())
         
         if (onDragGesture){
             onDragGesture(curTouch)
@@ -178,7 +181,6 @@ export const useGestures = (
 
         let rotate = get360angleVector2D(curDelta, prevDelta) * 25
 
-        // useRotateMessage(rotate)
         if (onRotateGesture){
             onRotateGesture(rotate)
         }
@@ -192,7 +194,6 @@ export const useGestures = (
             new Vector([maxDotProduct, maxDotProduct])
         )
 
-        // useDoubleDragMessage(onGoingTouches.current.length, doubleDragFinal)
         if (onDoubleDragGesture)
             onDoubleDragGesture(doubleDragFinal, onGoingTouches.current)
     }

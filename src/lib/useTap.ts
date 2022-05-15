@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { IPointer } from './gestures'
 
 export interface ITap {
@@ -7,9 +7,13 @@ export interface ITap {
     timerTime: number
 }
 
-const useTap = () => {
-    const defaultDistance = 10
-    const timerTimeMax = 100
+const useTap = (
+    distanceTreshold: number,
+    holdTime: number
+) => {
+
+    // const distanceTreshold = 8
+    // const holdTime = 100
     const tapInfo = useRef<ITap>({
         distance: 10,
         timer: null,
@@ -35,7 +39,7 @@ const useTap = () => {
     }
 
     const reset = () => {
-        tapInfo.current.distance = defaultDistance
+        tapInfo.current.distance = distanceTreshold
         tapInfo.current.timerTime = 0
         stopTimer()
         tapInfo.current.timer = null
@@ -51,19 +55,22 @@ const useTap = () => {
             return
         }
         
-        if (tapInfo.current.timerTime < timerTimeMax && tapInfo.current.distance > 0 && tapInfo.current.distance <= defaultDistance){
+        if (tapInfo.current.timerTime < holdTime && tapInfo.current.distance > 0 && tapInfo.current.distance <= distanceTreshold){
             onTap()
             reset()
         }
             
-        else if (tapInfo.current.timerTime >= timerTimeMax && tapInfo.current.distance > 0 && tapInfo.current.distance <= defaultDistance){
+        else if (tapInfo.current.timerTime >= holdTime && tapInfo.current.distance > 0 && tapInfo.current.distance <= distanceTreshold){
             onHold()
             reset()
         }
     }
 
-    const getTimer = () => {
-        return tapInfo.current.timer
+    const canDrag = () => {
+        if (tapInfo.current.distance > 0 && tapInfo.current.distance <= distanceTreshold){
+            return false
+        }
+        return true
     }
 
     return {
@@ -72,7 +79,7 @@ const useTap = () => {
         reset,
         updateDistance,
         differentiatetapHold,
-        getTimer
+        canDrag
     }
 }
 
