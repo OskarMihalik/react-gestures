@@ -9,7 +9,9 @@ export interface ITap {
 
 const useTap = (
     distanceTreshold: number,
-    holdTime: number
+    holdTime: number,
+    getCurrentTouch: () => IPointer | null,
+    onHoldGesture: ((pointer: IPointer) => void) | undefined
 ) => {
 
     // const distanceTreshold = 8
@@ -25,8 +27,16 @@ const useTap = (
             reset()
         }else{
             tapInfo.current.timer = setInterval(()=>{
-            tapInfo.current.timerTime += 1
-        }, 1)
+            tapInfo.current.timerTime += 100
+            if (!onHoldGesture)
+                return
+            if (tapInfo.current.timerTime >= holdTime && tapInfo.current.distance > 0 && tapInfo.current.distance <= distanceTreshold){
+                const pointer = getCurrentTouch()
+                if (pointer)
+                    onHoldGesture(pointer)
+                reset()
+            }
+        }, 100)
         }
         
     }

@@ -30,12 +30,19 @@ export const useGestures = (
     gestureComponentRef: any,
     gestures: IGestures,
     distanceTreshold: number = 8,
-    holdTime: number = 100
+    holdTime: number = 1000
 ) => {
     const {onTapGesture, onDragGesture, onRotateGesture, onPinchGesture, onDoubleDragGesture, onTripleDragGesture, onHoldGesture} = gestures
 
+    const getCurrentTouch = () => {
+            if ( onGoingTouches.current.length > 0)
+                return  onGoingTouches.current[0]
+            
+            return null
+        }
+
     const onGoingTouches = useRef<IPointer[]>([])
-    const tap = useTap(distanceTreshold, holdTime)
+    const tap = useTap(distanceTreshold, holdTime, getCurrentTouch, onHoldGesture)
 
     const copyTouch = (event: PointerEvent): IPointer => {
         let delta = new Vector([0, 0])
@@ -59,6 +66,8 @@ export const useGestures = (
         }
         onGoingTouches.current.splice(index, 1)
     }
+
+    
 
     const onGoingTouchIndexById = (idToFind: number) => {
         for (var i = 0; i < onGoingTouches.current.length; i++) {
