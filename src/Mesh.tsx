@@ -55,13 +55,18 @@ const Mesh = (props: Props) => {
         myMeshRef.current.position.y -= (direction.at(1) * 0.05)
     }
 
+    const onHold = (pointer: IPointer) => {
+        console.log("Hold:", pointer.position)
+    }
+
     useGestures(props.componentRef, {
         onTapGesture: onTap,
         onDragGesture: onDrag,
         onPinchGesture: onPinch,
         onRotateGesture: onRotate,
         onDoubleDragGesture: onDoubleDrag,
-        onTripleDragGesture: onTripleDrag
+        onTripleDragGesture: onTripleDrag,
+        onHoldGesture: onHold
     }
     )
 

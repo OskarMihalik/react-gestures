@@ -4,8 +4,7 @@ import { IPointer } from './gestures'
 export interface ITap {
     distance: number,
     timer: NodeJS.Timeout | null,
-    timerTime: number,
-    fingerId: number
+    timerTime: number
 }
 
 const useTap = () => {
@@ -15,7 +14,6 @@ const useTap = () => {
         distance: 10,
         timer: null,
         timerTime: 0,
-        fingerId: -1
     })
 
     const startTimer = () => {
@@ -33,49 +31,48 @@ const useTap = () => {
         if (tapInfo.current.timer){
             clearInterval(tapInfo.current.timer)
             tapInfo.current.timerTime = 0
-            // debugger
         }
     }
 
     const reset = () => {
         tapInfo.current.distance = defaultDistance
         tapInfo.current.timerTime = 0
-        tapInfo.current.fingerId = -1
         stopTimer()
+        tapInfo.current.timer = null
     }
 
     const updateDistance = (traveled: number) => {
-        tapInfo.current.distance -= traveled
+        if (tapInfo.current.timer)
+            tapInfo.current.distance -= traveled
     }
 
     const differentiatetapHold = (onTap: () => void, onHold: () => void) => {
-        if (tapInfo.current.timerTime < timerTimeMax && tapInfo.current.distance > 0){
+        if (!tapInfo.current.timer){
+            return
+        }
+        
+        if (tapInfo.current.timerTime < timerTimeMax && tapInfo.current.distance > 0 && tapInfo.current.distance <= defaultDistance){
             onTap()
-            console.log("tap")
             reset()
         }
             
-        else if (tapInfo.current.timerTime >= timerTimeMax && tapInfo.current.distance > 0){
+        else if (tapInfo.current.timerTime >= timerTimeMax && tapInfo.current.distance > 0 && tapInfo.current.distance <= defaultDistance){
             onHold()
-            console.log("hold")
             reset()
         }
-        debugger
-            
     }
 
-    const setTap = (fingerId: number) => {
-        tapInfo.current.fingerId = fingerId
+    const getTimer = () => {
+        return tapInfo.current.timer
     }
 
     return {
-        tapInfo,
         startTimer,
         stopTimer,
         reset,
         updateDistance,
         differentiatetapHold,
-        setTap
+        getTimer
     }
 }
 

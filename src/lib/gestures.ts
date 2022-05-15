@@ -26,20 +26,12 @@ export interface IGestures {
     onTripleDragGesture?: (direction: Vector, pointers: IPointer[]) => void,
 }
 
-interface ITap {
-    distance: number,
-    timer: NodeJS.Timeout | null,
-    timerTime: number,
-    fingerId: number
-}
-
 export const useGestures = (
     gestureComponentRef: any,
     gestures: IGestures
 ) => {
     const {onTapGesture, onDragGesture, onRotateGesture, onPinchGesture, onDoubleDragGesture, onTripleDragGesture, onHoldGesture} = gestures
 
-    const dragDistance = useRef(0) // save drag distance for calculating if tap is possible
     const onGoingTouches = useRef<IPointer[]>([])
     const tap = useTap()
 
@@ -82,34 +74,33 @@ export const useGestures = (
         onGoingTouches.current.push(copyTouch(event))
         const index = onGoingTouchIndexById(event.pointerId)
 
-        tap.startTimer()
+        if (onGoingTouches.current.length === 1)
+            tap.startTimer()
 
         handleGestures(index)
     }
 
     const handleEnd = (event: PointerEvent) => {
         const index = onGoingTouchIndexById(event.pointerId)
-        // if (
-        //     onGoingTouches.current.length === 1 &&
-        //     dragDistance.current < 10 &&
-        //     dragDistance.current >= 0 &&
-        //     index !== -1
-        // ) {
-        //     if (onTapGesture){
-        //         onTapGesture(onGoingTouches.current[index])
-        //     }
-        // }
         if (index === -1){
             return
         }
-        tap.differentiatetapHold(
-            ()=> {if (onTapGesture) onTapGesture(onGoingTouches.current[index])}, 
-            ()=> {if (onHoldGesture) onHoldGesture(onGoingTouches.current[index])}
-            )
 
+        if (onGoingTouches.current.length === 1){
+            tap.differentiatetapHold(
+            () => {
+                if (onTapGesture)
+                    onTapGesture(onGoingTouches.current[index])
+            }, 
+            () => {
+                if (onHoldGesture) 
+                    onHoldGesture(onGoingTouches.current[index])
+            }
+            )
+        }
+        
         tap.reset()
 
-        dragDistance.current = -0.1
         onGoingTouches.current.splice(index, 1)
     }
 
@@ -134,19 +125,16 @@ export const useGestures = (
             pinchGesture()
             rotateGesture()
             doubleDragGesture()
-            dragDistance.current = -0.1
             tap.reset()
 
         } else if (onGoingTouches.current.length === 3) {
             tripleDragGesture()
-            dragDistance.current = -0.1
             tap.reset()
         }
     }
 
     const dragGesture = (touchIndex: number) => {
         const curTouch = onGoingTouches.current[touchIndex]
-        dragDistance.current += curTouch.delta.length()
         tap.updateDistance(curTouch.delta.length())
         
         if (onDragGesture){
