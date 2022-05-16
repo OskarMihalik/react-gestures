@@ -69,7 +69,7 @@ const Mesh = (props: Props) => {
         onHoldGesture: onHold
     },
         // 8,
-        // 100
+        // 1000
     )
 
     return (
