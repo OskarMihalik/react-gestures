@@ -1,5 +1,5 @@
 {
-  "name": "react-gestures",
+  "name": "react-multitouch-gestures",
   "version": "0.1.0",
   "keywords": ["react", "gestures"],
   "main": "dist/index.js",
@@ -9,7 +9,7 @@
     "type": "git",
     "url": "git+https://github.com/OskarMihalik/react-gestures.git"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
     "@testing-library/jest-dom": "^5.16.4",
