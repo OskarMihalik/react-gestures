@@ -14,6 +14,10 @@ function App() {
     meshRef.current.position.x = 0
     meshRef.current.position.y = 0
     meshRef.current.position.z = 0
+
+    meshRef.current.scale.x = 1
+    meshRef.current.scale.y = 1
+    meshRef.current.scale.z = 1
   }
 
   return (
