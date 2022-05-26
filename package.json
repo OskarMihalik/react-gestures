@@ -1,10 +1,12 @@
 {
   "name": "react-multitouch-gestures",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "keywords": ["react", "gestures"],
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "module": "dist/index.js",
   "files": [ "dist", "README.md" ],
+  "declaration": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OskarMihalik/react-gestures.git"

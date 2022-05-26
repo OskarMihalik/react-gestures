@@ -14,8 +14,6 @@ const useTap = (
     onHoldGesture: ((pointer: IPointer) => void) | undefined
 ) => {
 
-    // const distanceTreshold = 8
-    // const holdTime = 100
     const tapInfo = useRef<ITap>({
         distance: 10,
         timer: null,

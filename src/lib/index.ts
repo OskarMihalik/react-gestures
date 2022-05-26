@@ -1,3 +1,3 @@
-import { useGestures, IPointer } from "./gestures";
+import { useGestures } from "./gestures";
 
 export {useGestures}
