@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "declaration": true,
     "allowJs": true,
     "skipLibCheck": true,
@@ -19,9 +15,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "rootDir": "src/lib",
+    "outDir": "dist"
   },
-  "include": [
-    "src"
+  "include": ["src/lib"],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "src/**/*.test.tsx",
+    "src/**/*.stories.tsx"
   ]
 }
