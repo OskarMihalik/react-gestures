@@ -24,8 +24,9 @@ function App() {
     <div style={{
       height: window.innerHeight
     }}>
-      <Canvas ref={componentRef} style={{ touchAction: 'none' }}>
-        {/* <OrbitControls /> */}
+      <Canvas
+        ref={componentRef}
+        style={{ touchAction: 'none' }}>
         <directionalLight intensity={0.5} />
         <ambientLight intensity={0.5} />
         <spotLight position={[10, 15, 10]} angle={0.9} />

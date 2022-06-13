@@ -259,6 +259,7 @@ export const useGestures = (
     component?.addEventListener("pointerleave", handleCancel, false);
 
     return () => {
+      let component = gestureComponentRef.current;
       component?.removeEventListener("pointerdown", handleStart);
       component?.removeEventListener("pointercancel", handleCancel);
       component?.removeEventListener("pointerup", handleEnd);
