@@ -16,10 +16,10 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "rootDir": "src/lib",
+    "rootDir": "src",
     "outDir": "dist"
   },
-  "include": ["src/lib"],
+  "include": ["src/lib", "src"],
   "exclude": [
     "dist",
     "node_modules",
