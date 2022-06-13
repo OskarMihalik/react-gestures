@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React from 'react'
 import { MeshProps } from 'react-three-fiber'
 import { Vector } from 'ts-matrix'
 import { IPointer, useGestures } from './lib/gestures'
