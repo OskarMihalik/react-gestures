@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Vector } from "ts-matrix";
 import useTap from "./useTap";
 import {
@@ -27,7 +27,7 @@ export interface IGestures {
 }
 
 export const useGestures = (
-  gestureComponentRef: React.MutableRefObject<HTMLElement>,
+  gestureComponent: any,
   gestures: IGestures,
   distanceTreshold: number = 8,
   holdTime: number = 1000
@@ -251,22 +251,21 @@ export const useGestures = (
       handleGestures(index);
     };
 
-    let component = gestureComponentRef.current;
-    component?.addEventListener("pointerdown", handleStart, false);
-    component?.addEventListener("pointercancel", handleCancel, false);
-    component?.addEventListener("pointerup", handleEnd, false);
-    component?.addEventListener("pointermove", handleMove, false);
-    component?.addEventListener("pointerleave", handleCancel, false);
+    gestureComponent?.addEventListener("pointerdown", handleStart, false);
+    gestureComponent?.addEventListener("pointercancel", handleCancel, false);
+    gestureComponent?.addEventListener("pointerup", handleEnd, false);
+    gestureComponent?.addEventListener("pointermove", handleMove, false);
+    gestureComponent?.addEventListener("pointerleave", handleCancel, false);
 
     return () => {
-      component?.removeEventListener("pointerdown", handleStart);
-      component?.removeEventListener("pointercancel", handleCancel);
-      component?.removeEventListener("pointerup", handleEnd);
-      component?.removeEventListener("pointermove", handleMove);
-      component?.removeEventListener("pointerleave", handleCancel);
+      gestureComponent?.removeEventListener("pointerdown", handleStart);
+      gestureComponent?.removeEventListener("pointercancel", handleCancel);
+      gestureComponent?.removeEventListener("pointerup", handleEnd);
+      gestureComponent?.removeEventListener("pointermove", handleMove);
+      gestureComponent?.removeEventListener("pointerleave", handleCancel);
     };
   }, [
-    gestureComponentRef,
+    gestureComponent,
     tap,
     copyTouch,
     handleGestures,

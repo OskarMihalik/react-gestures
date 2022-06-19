@@ -1,7 +1,6 @@
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
-import dts from "rollup-plugin-dts";
 import { terser } from "rollup-plugin-terser";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
 
@@ -16,11 +15,6 @@ export default [
         format: "cjs",
         sourcemap: true,
       },
-      {
-        file: packageJson.module,
-        format: "esm",
-        sourcemap: true,
-      },
     ],
     plugins: [
       peerDepsExternal(),
@@ -30,10 +24,5 @@ export default [
       terser(),
     ],
     external: ["react", "react-dom", "ts-matrix"],
-  },
-  {
-    input: "dist/index.d.ts",
-    output: [{ file: "dist/index.d.ts", format: "esm" }],
-    plugins: [dts()],
   },
 ];
