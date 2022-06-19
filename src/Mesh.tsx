@@ -58,7 +58,7 @@ const Mesh = (props: Props) => {
         console.log("Hold:", pointer.position)
     }
 
-    useGestures(props.componentRef.current, {
+    useGestures(props.componentRef, {
         onTapGesture: onTap,
         onDragGesture: onDrag,
         onPinchGesture: onPinch,

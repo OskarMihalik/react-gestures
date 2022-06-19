@@ -27,7 +27,7 @@ export interface IGestures {
 }
 
 export const useGestures = (
-  gestureComponent: any,
+  gestureComponentRef: any,
   gestures: IGestures,
   distanceTreshold: number = 8,
   holdTime: number = 1000
@@ -251,21 +251,22 @@ export const useGestures = (
       handleGestures(index);
     };
 
-    gestureComponent?.addEventListener("pointerdown", handleStart, false);
-    gestureComponent?.addEventListener("pointercancel", handleCancel, false);
-    gestureComponent?.addEventListener("pointerup", handleEnd, false);
-    gestureComponent?.addEventListener("pointermove", handleMove, false);
-    gestureComponent?.addEventListener("pointerleave", handleCancel, false);
+    let component = gestureComponentRef.current;
+    component?.addEventListener("pointerdown", handleStart, false);
+    component?.addEventListener("pointercancel", handleCancel, false);
+    component?.addEventListener("pointerup", handleEnd, false);
+    component?.addEventListener("pointermove", handleMove, false);
+    component?.addEventListener("pointerleave", handleCancel, false);
 
     return () => {
-      gestureComponent?.removeEventListener("pointerdown", handleStart);
-      gestureComponent?.removeEventListener("pointercancel", handleCancel);
-      gestureComponent?.removeEventListener("pointerup", handleEnd);
-      gestureComponent?.removeEventListener("pointermove", handleMove);
-      gestureComponent?.removeEventListener("pointerleave", handleCancel);
+      component?.removeEventListener("pointerdown", handleStart);
+      component?.removeEventListener("pointercancel", handleCancel);
+      component?.removeEventListener("pointerup", handleEnd);
+      component?.removeEventListener("pointermove", handleMove);
+      component?.removeEventListener("pointerleave", handleCancel);
     };
   }, [
-    gestureComponent,
+    gestureComponentRef,
     tap,
     copyTouch,
     handleGestures,
