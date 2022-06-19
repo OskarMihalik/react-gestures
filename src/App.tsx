@@ -26,7 +26,8 @@ function App() {
     }}>
       <Canvas
         ref={componentRef}
-        style={{ touchAction: 'none' }}>
+        style={{ touchAction: 'none' }}
+      >
         <directionalLight intensity={0.5} />
         <ambientLight intensity={0.5} />
         <spotLight position={[10, 15, 10]} angle={0.9} />
