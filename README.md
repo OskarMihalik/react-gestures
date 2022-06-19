@@ -21,7 +21,7 @@ function App() {
         console.log("dragging")
     }
 
-    useGestures(component.current, {
+    useGestures(component, {
     onTapGesture: (pointer) => console.log(pointer.position.at(0)) //example how to print x position of tap
     onDragGesture: onDrag,
     // onPinchGesture: onPinch,
