@@ -1,4 +1,4 @@
-# react-gestures
+# react-multitouch-gestures
 
 this is an react gesture library that supports:
 
@@ -8,7 +8,7 @@ this is an react gesture library that supports:
 - drag with two fingers
 - drag with three fingers
 
-demo...
+[demo](https://codesandbox.io/s/late-cookies-mg0kvt)
 
 # How to use
 
