@@ -5,6 +5,7 @@ this is an react gesture library that supports:
 - tap
 - hold
 - rotate
+- pinch
 - drag with one finger
 - drag with two fingers
 - drag with three fingers
